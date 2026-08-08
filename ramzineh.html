@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧬 بازی رمزهای DNA</title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b2a35 0%, #1a4a5a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .game-container {
+            max-width: 750px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 40px 40px 30px 30px;
+            padding: 20px 20px 25px;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff4d6;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            margin-bottom: 4px;
+        }
+
+        h1 i {
+            color: #f9d56e;
+            margin-left: 10px;
+        }
+
+        .sub-head {
+            text-align: center;
+            color: #b3d9e8;
+            font-size: 0.85rem;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .question-box {
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 30px;
+            padding: 15px 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 215, 120, 0.3);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .prompt {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px 15px;
+        }
+
+        .prompt-item {
+            background: #1f3e4b;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f0f9ff;
+            box-shadow: inset 0 -2px 0 #0d1f27;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+            flex: 1 1 auto;
+        }
+
+        .prompt-item i {
+            color: #f9d56e;
+            font-size: 1rem;
+        }
+
+        .prompt-item strong {
+            font-size: 1.1rem;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        /* =============== استایل کد گم شده (آبی چشمک‌زن) =============== */
+        .missing-code {
+            background: #1565C0;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 3px;
+            display: inline-block;
+            animation: blinkBlue 1s ease-in-out infinite;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        @keyframes blinkBlue {
+            0% {
+                background: #1565C0;
+            }
+            50% {
+                background: #42A5F5;
+            }
+            100% {
+                background: #1565C0;
+            }
+        }
+
+        /* وقتی درست جواب داده شود */
+        .missing-code.correct {
+            background: #2e7d32 !important;
+            animation: none !important;
+            color: #ffffff;
+        }
+
+        /* وقتی اشتباه جواب داده شود */
+        .missing-code.wrong {
+            background: #c62828 !important;
+            animation: shake 0.4s ease-in-out !important;
+            color: #ffffff;
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-10px);
+            }
+            40% {
+                transform: translateX(10px);
+            }
+            60% {
+                transform: translateX(-6px);
+            }
+            80% {
+                transform: translateX(6px);
+            }
+        }
+        /* ========================================================== */
+
+        .missing-label-simple {
+            font-size: 0.9rem;
+            background: #f9d56e;
+            color: #1f3e4b;
+            padding: 5px 18px;
+            border-radius: 40px;
+            font-weight: 700;
+            display: inline-block;
+            box-shadow: 0 3px 0 #b38f3c;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+
+        #userGuess {
+            padding: 10px 18px;
+            font-size: 1.4rem;
+            width: 160px;
+            border: none;
+            border-radius: 40px;
+            background: #eef7fc;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 4px;
+            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1), 0 0 0 3px #89b9cf;
+            transition: 0.2s;
+            color: #10343f;
+            text-transform: uppercase;
+        }
+
+        #userGuess:focus {
+            outline: none;
+            transform: scale(1.02);
+            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.1), 0 0 0 4px #f9d56e;
+        }
+
+        #userGuess.correct {
+            background: #a8e6cf;
+            box-shadow: 0 0 20px #7bed9f88, 0 0 0 4px #7bed9f;
+        }
+
+        #userGuess.wrong {
+            background: #ffb3b3;
+            box-shadow: 0 0 20px #ff6b6b88, 0 0 0 4px #ff6b6b;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        .btn {
+            background: #f9d56e;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a3a44;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 0 #b38f3c;
+            border: 1px solid #ffe3a3;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #b38f3c;
+            background: #ffe28b;
+        }
+
+        .btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #b38f3c;
+        }
+
+        .btn-secondary {
+            background: #9ac2d4;
+            box-shadow: 0 4px 0 #577b8b;
+            border-color: #b5d9ec;
+            color: #07212b;
+        }
+
+        .btn-secondary:hover {
+            background: #b2d8ec;
+            box-shadow: 0 6px 0 #577b8b;
+        }
+
+        .feedback {
+            margin: 12px 0 10px;
+            padding: 10px 16px;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-right: 4px solid #f9d56e;
+            transition: 0.3s;
+        }
+
+        .feedback i {
+            font-size: 1.3rem;
+            color: #f9d56e;
+        }
+
+        .feedback-text {
+            font-size: 1rem;
+            color: #f2faff;
+            font-weight: 500;
+            line-height: 1.4;
+        }
+
+        .amino-acid-name {
+            background: #2f6a7a;
+            padding: 4px 16px;
+            border-radius: 40px;
+            font-weight: 700;
+            color: #fff9e6;
+            display: inline-block;
+            box-shadow: 0 0 15px #2f6a7aaa;
+            font-size: 0.9rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: #daeef9;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .stats span i {
+            margin-left: 5px;
+            color: #f9d56e;
+        }
+
+        .small-note {
+            color: #9abcd0;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 15px 12px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .prompt-item {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+                min-width: 110px;
+            }
+
+            .prompt-item strong {
+                font-size: 0.95rem;
+                min-width: 40px;
+            }
+
+            .missing-code {
+                font-size: 0.95rem;
+                padding: 6px 12px;
+                min-width: 40px;
+            }
+
+            #userGuess {
+                width: 130px;
+                font-size: 1.2rem;
+                padding: 8px 14px;
+            }
+
+            .btn {
+                padding: 8px 18px;
+                font-size: 0.9rem;
+            }
+
+            .feedback-text {
+                font-size: 0.9rem;
+            }
+
+            .stats {
+                font-size: 0.75rem;
+                padding: 6px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .prompt {
+                gap: 5px 10px;
+            }
+            
+            .prompt-item {
+                font-size: 0.75rem;
+                padding: 5px 10px;
+                min-width: 90px;
+                flex: 1 1 45%;
+            }
+
+            .prompt-item strong {
+                font-size: 0.85rem;
+                min-width: 35px;
+            }
+
+            .missing-code {
+                font-size: 0.85rem;
+                padding: 5px 10px;
+                min-width: 35px;
+            }
+
+            #userGuess {
+                width: 110px;
+                font-size: 1rem;
+                padding: 6px 10px;
+                letter-spacing: 3px;
+            }
+
+            .input-area {
+                gap: 8px;
+            }
+
+            .btn {
+                padding: 6px 14px;
+                font-size: 0.8rem;
+                gap: 5px;
+            }
+
+            .feedback {
+                padding: 8px 12px;
+                min-height: 40px;
+            }
+
+            .feedback-text {
+                font-size: 0.8rem;
+            }
+
+            .stats {
+                font-size: 0.7rem;
+                padding: 5px 10px;
+            }
+
+            .small-note {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="game-container">
+        <h1><i class="fas fa-dna"></i> رمز‌یاب DNA</h1>
+        <div class="sub-head"><i class="fas fa-arrow-left" style="margin-left: 6px;"></i>رمز گم‌شده را پیدا کن</div>
+
+        <!-- question box -->
+        <div class="question-box" id="questionBox">
+            <div class="prompt" id="promptDisplay">
+                <!-- dynamic content -->
+            </div>
+        </div>
+
+        <!-- input area - یک سطر -->
+        <div class="input-area">
+            <input type="text" id="userGuess" maxlength="3" placeholder="XXX" autocomplete="off">
+            <button class="btn btn-secondary" id="newQuestionBtn"><i class="fas fa-shuffle"></i> سوال جدید</button>
+        </div>
+
+        <!-- feedback - بدون آیکون -->
+        <div class="feedback" id="feedbackArea">
+            <span class="feedback-text" id="feedbackText">کد گم شده را پیدا کن!</span>
+        </div>
+
+        <!-- stats -->
+        <div class="stats">
+            <span><i class="fas fa-hashtag"></i> شماره: <strong id="questionCounter">1</strong></span>
+            <span><i class="fas fa-trophy"></i> امتیاز: <strong id="scoreDisplay">0</strong></span>
+            <span><i class="fas fa-flask"></i> آمینواسید: <span id="aminoDisplay"
+                    style="background:#1f4a57; padding:1px 12px; border-radius:30px;">---</span></span>
+        </div>
+
+        <div class="small-note">
+    <i class="fas fa-info-circle"></i> DNA (sense) · RNA (codon) · tRNA (anticodon) · DNA (template)
+</div>
+<div class="small-note" style="margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
+    <i class="fas fa-info-circle"></i> 
+    
+        <span itemprop="name">معصومه نوروزی</span>، 
+        <span itemprop="jobTitle">دبیر زیست‌شناسی</span>
+    </span>
+</div>
+    </div>
+
+    <script>
+        // ============================================================
+        // جدول کامل ۶۴ کدون استاندارد (به همراه STOP)
+        // ============================================================
+        const codonTable = [
+            { codon: 'GCU', anticodon: 'CGA', dna: 'GCT', template: 'CGA', aminoAcid: 'آلانین' },
+            { codon: 'GCC', anticodon: 'CGG', dna: 'GCC', template: 'CGG', aminoAcid: 'آلانین' },
+            { codon: 'GCA', anticodon: 'CGU', dna: 'GCA', template: 'CGT', aminoAcid: 'آلانین' },
+            { codon: 'GCG', anticodon: 'CGC', dna: 'GCG', template: 'CGC', aminoAcid: 'آلانین' },
+            { codon: 'CGU', anticodon: 'GCA', dna: 'CGT', template: 'GCA', aminoAcid: 'آرژنین' },
+            { codon: 'CGC', anticodon: 'GCG', dna: 'CGC', template: 'GCG', aminoAcid: 'آرژنین' },
+            { codon: 'CGA', anticodon: 'GCU', dna: 'CGA', template: 'GCT', aminoAcid: 'آرژنین' },
+            { codon: 'CGG', anticodon: 'GCC', dna: 'CGG', template: 'GCC', aminoAcid: 'آرژنین' },
+            { codon: 'AGA', anticodon: 'UCU', dna: 'AGA', template: 'TCT', aminoAcid: 'آرژنین' },
+            { codon: 'AGG', anticodon: 'UCC', dna: 'AGG', template: 'TCC', aminoAcid: 'آرژنین' },
+            { codon: 'AAU', anticodon: 'UUA', dna: 'AAT', template: 'TTA', aminoAcid: 'آسپاراژین' },
+            { codon: 'AAC', anticodon: 'UUG', dna: 'AAC', template: 'TTG', aminoAcid: 'آسپاراژین' },
+            { codon: 'GAU', anticodon: 'CUA', dna: 'GAT', template: 'CTA', aminoAcid: 'آسپارتیک اسید' },
+            { codon: 'GAC', anticodon: 'CUG', dna: 'GAC', template: 'CTG', aminoAcid: 'آسپارتیک اسید' },
+            { codon: 'UGU', anticodon: 'ACA', dna: 'TGT', template: 'ACA', aminoAcid: 'سیستئین' },
+            { codon: 'UGC', anticodon: 'ACG', dna: 'TGC', template: 'ACG', aminoAcid: 'سیستئین' },
+            { codon: 'CAA', anticodon: 'GUU', dna: 'CAA', template: 'GTT', aminoAcid: 'گلوتامین' },
+            { codon: 'CAG', anticodon: 'GUC', dna: 'CAG', template: 'GTC', aminoAcid: 'گلوتامین' },
+            { codon: 'GAA', anticodon: 'CUU', dna: 'GAA', template: 'CTT', aminoAcid: 'گلوتامیک اسید' },
+            { codon: 'GAG', anticodon: 'CUC', dna: 'GAG', template: 'CTC', aminoAcid: 'گلوتامیک اسید' },
+            { codon: 'GGU', anticodon: 'CCA', dna: 'GGT', template: 'CCA', aminoAcid: 'گلیسین' },
+            { codon: 'GGC', anticodon: 'CCG', dna: 'GGC', template: 'CCG', aminoAcid: 'گلیسین' },
+            { codon: 'GGA', anticodon: 'CCU', dna: 'GGA', template: 'CCT', aminoAcid: 'گلیسین' },
+            { codon: 'GGG', anticodon: 'CCC', dna: 'GGG', template: 'CCC', aminoAcid: 'گلیسین' },
+            { codon: 'CAU', anticodon: 'GUA', dna: 'CAT', template: 'GTA', aminoAcid: 'هیستیدین' },
+            { codon: 'CAC', anticodon: 'GUG', dna: 'CAC', template: 'GTG', aminoAcid: 'هیستیدین' },
+            { codon: 'AUU', anticodon: 'UAA', dna: 'ATT', template: 'TAA', aminoAcid: 'ایزولوسین' },
+            { codon: 'AUC', anticodon: 'UAG', dna: 'ATC', template: 'TAG', aminoAcid: 'ایزولوسین' },
+            { codon: 'AUA', anticodon: 'UAU', dna: 'ATA', template: 'TAT', aminoAcid: 'ایزولوسین' },
+            { codon: 'UUA', anticodon: 'AAU', dna: 'TTA', template: 'AAT', aminoAcid: 'لوسین' },
+            { codon: 'UUG', anticodon: 'AAC', dna: 'TTG', template: 'AAC', aminoAcid: 'لوسین' },
+            { codon: 'CUU', anticodon: 'GAA', dna: 'CTT', template: 'GAA', aminoAcid: 'لوسین' },
+            { codon: 'CUC', anticodon: 'GAG', dna: 'CTC', template: 'GAG', aminoAcid: 'لوسین' },
+            { codon: 'CUA', anticodon: 'GAU', dna: 'CTA', template: 'GAT', aminoAcid: 'لوسین' },
+            { codon: 'CUG', anticodon: 'GAC', dna: 'CTG', template: 'GAC', aminoAcid: 'لوسین' },
+            { codon: 'AAA', anticodon: 'UUU', dna: 'AAA', template: 'TTT', aminoAcid: 'لیزین' },
+            { codon: 'AAG', anticodon: 'UUC', dna: 'AAG', template: 'TTC', aminoAcid: 'لیزین' },
+            { codon: 'AUG', anticodon: 'UAC', dna: 'ATG', template: 'TAC', aminoAcid: 'متیونین (START)' },
+            { codon: 'UUU', anticodon: 'AAA', dna: 'TTT', template: 'AAA', aminoAcid: 'فنیل‌آلانین' },
+            { codon: 'UUC', anticodon: 'AAG', dna: 'TTC', template: 'AAG', aminoAcid: 'فنیل‌آلانین' },
+            { codon: 'CCU', anticodon: 'GGA', dna: 'CCT', template: 'GGA', aminoAcid: 'پرولین' },
+            { codon: 'CCC', anticodon: 'GGG', dna: 'CCC', template: 'GGG', aminoAcid: 'پرولین' },
+            { codon: 'CCA', anticodon: 'GGU', dna: 'CCA', template: 'GGT', aminoAcid: 'پرولین' },
+            { codon: 'CCG', anticodon: 'GGC', dna: 'CCG', template: 'GGC', aminoAcid: 'پرولین' },
+            { codon: 'UCU', anticodon: 'AGA', dna: 'TCT', template: 'AGA', aminoAcid: 'سرین' },
+            { codon: 'UCC', anticodon: 'AGG', dna: 'TCC', template: 'AGG', aminoAcid: 'سرین' },
+            { codon: 'UCA', anticodon: 'AGU', dna: 'TCA', template: 'AGT', aminoAcid: 'سرین' },
+            { codon: 'UCG', anticodon: 'AGC', dna: 'TCG', template: 'AGC', aminoAcid: 'سرین' },
+            { codon: 'AGU', anticodon: 'UCA', dna: 'AGT', template: 'TCA', aminoAcid: 'سرین' },
+            { codon: 'AGC', anticodon: 'UCG', dna: 'AGC', template: 'TCG', aminoAcid: 'سرین' },
+            { codon: 'ACU', anticodon: 'UGA', dna: 'ACT', template: 'TGA', aminoAcid: 'ترئونین' },
+            { codon: 'ACC', anticodon: 'UGG', dna: 'ACC', template: 'TGG', aminoAcid: 'ترئونین' },
+            { codon: 'ACA', anticodon: 'UGU', dna: 'ACA', template: 'TGT', aminoAcid: 'ترئونین' },
+            { codon: 'ACG', anticodon: 'UGC', dna: 'ACG', template: 'TGC', aminoAcid: 'ترئونین' },
+            { codon: 'UGG', anticodon: 'ACC', dna: 'TGG', template: 'ACC', aminoAcid: 'تریپتوفان' },
+            { codon: 'UAU', anticodon: 'AUA', dna: 'TAT', template: 'ATA', aminoAcid: 'تیروزین' },
+            { codon: 'UAC', anticodon: 'AUG', dna: 'TAC', template: 'ATG', aminoAcid: 'تیروزین' },
+            { codon: 'GUU', anticodon: 'CAA', dna: 'GTT', template: 'CAA', aminoAcid: 'والین' },
+            { codon: 'GUC', anticodon: 'CAG', dna: 'GTC', template: 'CAG', aminoAcid: 'والین' },
+            { codon: 'GUA', anticodon: 'CAU', dna: 'GTA', template: 'CAT', aminoAcid: 'والین' },
+            { codon: 'GUG', anticodon: 'CAC', dna: 'GTG', template: 'CAC', aminoAcid: 'والین' },
+            { codon: 'UAA', anticodon: 'AUU', dna: 'TAA', template: 'ATT', aminoAcid: 'STOP' },
+            { codon: 'UAG', anticodon: 'AUC', dna: 'TAG', template: 'ATC', aminoAcid: 'STOP' },
+            { codon: 'UGA', anticodon: 'ACU', dna: 'TGA', template: 'ACT', aminoAcid: 'STOP' }
+        ];
+
+        // ============================================================
+        // متغیرهای وضعیت بازی
+        // ============================================================
+        let currentQuestion = null;
+        let missingType = '';
+        let isAnswered = false;
+        let questionCount = 0;
+        let score = 0;
+
+        // ============================================================
+        // المان‌های DOM
+        // ============================================================
+        const promptDisplay = document.getElementById('promptDisplay');
+        const feedbackText = document.getElementById('feedbackText');
+        const userGuessInput = document.getElementById('userGuess');
+        const newQuestionBtn = document.getElementById('newQuestionBtn');
+        const questionCounter = document.getElementById('questionCounter');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const aminoDisplay = document.getElementById('aminoDisplay');
+        const feedbackArea = document.getElementById('feedbackArea');
+
+        let missingCodeElement = null;
+
+        // ============================================================
+        // توابع اصلی
+        // ============================================================
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateNewQuestion() {
+            const item = getRandomItem(codonTable);
+            const types = ['codon', 'anticodon', 'dna', 'template'];
+            const missing = types[Math.floor(Math.random() * types.length)];
+
+            currentQuestion = item;
+            missingType = missing;
+            isAnswered = false;
+
+            renderQuestion(item, missing);
+
+            userGuessInput.value = '';
+            userGuessInput.className = '';
+            userGuessInput.focus();
+            feedbackText.innerHTML = 'کد گم شده را پیدا کن!';
+            feedbackArea.style.borderRightColor = '#f9d56e';
+            aminoDisplay.textContent = '---';
+
+            questionCount++;
+            questionCounter.textContent = questionCount;
+        }
+
+        function renderQuestion(item, missing) {
+            let dnaDisplay = item.dna;
+            let codonDisplay = item.codon;
+            let anticodonDisplay = item.anticodon;
+            let templateDisplay = item.template;
+
+            let dnaClass = '';
+            let codonClass = '';
+            let anticodonClass = '';
+            let templateClass = '';
+
+            if (missing === 'dna') {
+                dnaDisplay = 'xxx';
+                dnaClass = 'missing-code';
+            } else if (missing === 'codon') {
+                codonDisplay = 'xxx';
+                codonClass = 'missing-code';
+            } else if (missing === 'anticodon') {
+                anticodonDisplay = 'xxx';
+                anticodonClass = 'missing-code';
+            } else if (missing === 'template') {
+                templateDisplay = 'xxx';
+                templateClass = 'missing-code';
+            }
+
+            promptDisplay.innerHTML = `
+            <div class="prompt-item"><i class="fas fa-dna"></i> DNA (رمزگذار) : <strong class="${dnaClass}">${dnaDisplay}</strong></div>
+            <div class="prompt-item"><i class="fas fa-rna"></i> RNA (کدون) : <strong class="${codonClass}">${codonDisplay}</strong></div>
+            <div class="prompt-item"><i class="fas fa-t"></i> tRNA (آنتی‌کدون) : <strong class="${anticodonClass}">${anticodonDisplay}</strong></div>
+            <div class="prompt-item"><i class="fas fa-dna"></i> DNA (الگو) : <strong class="${templateClass}">${templateDisplay}</strong></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:4px; width:100%; margin-top:6px;">
+                <span class="missing-label-simple"><i class="fas fa-search"></i> کد گم شده را پیدا کن!</span>
+            </div>
+        `;
+
+            missingCodeElement = document.querySelector('.missing-code');
+        }
+
+        function checkGuess() {
+            if (isAnswered || !currentQuestion) {
+                return;
+            }
+
+            const guess = userGuessInput.value.trim().toUpperCase();
+            if (guess.length !== 3) return;
+
+            let correctValue = '';
+            let typeName = '';
+            if (missingType === 'dna') {
+                correctValue = currentQuestion.dna;
+                typeName = 'DNA (sense)';
+            } else if (missingType === 'codon') {
+                correctValue = currentQuestion.codon;
+                typeName = 'RNA (codon)';
+            } else if (missingType === 'anticodon') {
+                correctValue = currentQuestion.anticodon;
+                typeName = 'tRNA (anticodon)';
+            } else if (missingType === 'template') {
+                correctValue = currentQuestion.template;
+                typeName = 'DNA (template)';
+            }
+
+            if (guess === correctValue) {
+                isAnswered = true;
+                score++;
+                scoreDisplay.textContent = score;
+                userGuessInput.className = 'correct';
+
+                if (missingCodeElement) {
+                    missingCodeElement.className = 'missing-code correct';
+                    missingCodeElement.textContent = correctValue;
+                }
+
+                const amino = currentQuestion.aminoAcid;
+                let aminoMsg = (amino === 'STOP')
+                    ? '⛔ کدون STOP (پایان ترجمه)'
+                    : `🧪 آمینواسید: <span class="amino-acid-name">${amino}</span>`;
+
+                feedbackText.innerHTML = `✅ درست! ${typeName} صحیح: <strong>${correctValue}</strong> — ${aminoMsg}`;
+                feedbackArea.style.borderRightColor = '#7bed9f';
+                aminoDisplay.textContent = (amino === 'STOP') ? 'STOP' : amino;
+            } else {
+                userGuessInput.className = 'wrong';
+
+                if (missingCodeElement) {
+                    missingCodeElement.className = 'missing-code wrong';
+                    setTimeout(() => {
+                        if (missingCodeElement && !isAnswered) {
+                            missingCodeElement.className = 'missing-code';
+                        }
+                    }, 400);
+                }
+
+                feedbackText.innerHTML = `❌ اشتباه! ${typeName} وارد شده <strong>${guess}</strong> صحیح نیست. دوباره تلاش کن.`;
+                feedbackArea.style.borderRightColor = '#ff6b6b';
+
+                setTimeout(() => {
+                    userGuessInput.className = '';
+                }, 400);
+            }
+        }
+
+        // ============================================================
+        // رویدادها
+        // ============================================================
+
+        userGuessInput.addEventListener('input', function () {
+            this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3);
+
+            if (this.value.length === 3) {
+                checkGuess();
+            } else {
+                this.className = '';
+                feedbackArea.style.borderRightColor = '#f9d56e';
+            }
+        });
+
+        newQuestionBtn.addEventListener('click', function () {
+            generateNewQuestion();
+            feedbackArea.style.borderRightColor = '#f9d56e';
+        });
+
+        userGuessInput.addEventListener('keydown', function (e) {
+            if (e.key === ' ') {
+                e.preventDefault();
+            }
+        });
+
+        // ============================================================
+        // شروع بازی
+        // ============================================================
+        generateNewQuestion();
+        scoreDisplay.textContent = '0';
+        questionCounter.textContent = '1';
+    </script>
+
+</body>
+
+</html>
